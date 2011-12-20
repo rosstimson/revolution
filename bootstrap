@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Request and read in db details from user
+echo "Please enter your database hostname
+(e.g. localhost) and press [ENTER]:"
+read db_host
+echo "Please enter your MODX database name and press [ENTER]:"
+read db_name
+echo "Please enter your MODX database user and press [ENTER]:"
+read db_user
+echo "Please enter your MODX database password and press [ENTER]:"
+read db_password
+echo "Please enter a table prefix for your MODX database if desired
+(e.g. modx_) and press [ENTER]:"
+read db_prefix
+
+# Regexes to add user variables & create new config files
+sed "s/localhost/$db_host/;
+     s/revo_test/$db_name/;
+     s/XPDO_DB_USER', ''/XPDO_DB_USER', '$db_user'/;
+     s/XPDO_DB_PASS', ''/XPDO_DB_PASS', '$db_password'/;
+     s/modx_/$db_prefix/"\
+     _build/build.config.sample.php > _build/build.config.php
+
+sed "s/localhost/$db_host/;
+     s/revo_test/$db_name/;
+     s/mysql_string_username']= ''/mysql_string_username']= '$db_user'/;
+     s/mysql_string_password']= ''/mysql_string_password']= '$db_password'/"\
+     _build/build.properties.sample.php > _build/build.properties.php
+
+# Build core transport
+php _build/transport.core.php
